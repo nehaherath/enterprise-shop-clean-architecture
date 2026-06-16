@@ -1,21 +1,18 @@
-using MediatR;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using MediatR;
 using EnterpriseShop.Domain;
 
 namespace EnterpriseShop.Application.Products
 {
-    public record AddProductCommand(string Name, string Description, decimal Price, int StockQuantity) : IRequest<Guid>;
+    public record AddProductCommand(string Name, string Description, decimal Price, int StockQuantity, string? ImagePath) : IRequest<Guid>;
 
     public class AddProductCommandHandler : IRequestHandler<AddProductCommand, Guid>
     {
-        private readonly IProductRepository _productRepository;
+        private readonly IProductRepository _repository;
 
-        // 💡 DbContext එක වෙනුවට අපි දැන් ඉන්ජෙක්ට් කරන්නේ Repository Interface එක!
-        public AddProductCommandHandler(IProductRepository productRepository)
+        public AddProductCommandHandler(IProductRepository repository)
         {
-            _productRepository = productRepository;
+            _repository = repository;
         }
 
         public async Task<Guid> Handle(AddProductCommand request, CancellationToken cancellationToken)
@@ -27,10 +24,10 @@ namespace EnterpriseShop.Application.Products
                 Description = request.Description,
                 Price = request.Price,
                 StockQuantity = request.StockQuantity,
-                CreatedAt = DateTime.UtcNow
+                ImagePath = request.ImagePath 
             };
 
-            return await _productRepository.AddAsync(product);
+            return await _repository.AddAsync(product);
         }
     }
 }
